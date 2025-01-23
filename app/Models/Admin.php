@@ -2,17 +2,18 @@
 
 namespace App\Models;
 
-// use Illuminate\Contracts\Auth\MustVerifyEmail;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
-use Illuminate\Foundation\Auth\User as Authenticatable;
+use Illuminate\Database\Eloquent\Model;
 use Illuminate\Notifications\Notifiable;
+use Illuminate\Foundation\Auth\User as Authenticatable;
 
-class User extends Authenticatable
+
+class Admin extends Authenticatable
 {
     /** @use HasFactory<\Database\Factories\UserFactory> */
     use HasFactory, Notifiable;
 
-    protected $guard = 'web';
+    protected $guard = 'admin';
 
     /**
      * The attributes that are mass assignable.
@@ -48,6 +49,7 @@ class User extends Authenticatable
         ];
     }
 
+
     public function getAuthIdentifierName()
     {
         return 'id';
@@ -76,22 +78,5 @@ class User extends Authenticatable
     public function getRememberTokenName()
     {
         return 'remember_token';
-    }
-
-    public function groups() {
-        return $this->belongsToMany(Group::class, 'user_groups');
-    }
-
-    public function permissions() {
-        return $this->hasManyThrough(Permission::class, GroupPermission::class, 'group_id', 'id', 'id', 'permission_id');
-    }
-
-    public function getPermissions()
-    {
-        return $this->groups()->with('permissions')->get()->pluck('permissions')->flatten()->unique('id');
-    }
-
-    public function hasPermission($controller, $method) {
-        return $this->permissions()->where('controller_name', $controller)->where('method_name', $method)->exists();
     }
 }
